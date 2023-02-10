@@ -2,6 +2,19 @@ import { useState, useEffect } from "react";
 import { Card } from "./card";
 
 export function Level(props) {
+  const [score, setScore] = useState(0);
+  const [bestScore, setBestScore] = useState(score);
+  const [currentLevel, setCurrentLevel] = useState(1);
+  const [levelContent, setLevelContent] = useState({
+    arr: [],
+    backgroundImage: "",
+  });
+  const [isGameOver, setIsGameOver] = useState(false);
+
+  function increaseScore() {
+    setScore(score + 1);
+  }
+
   class Waifu {
     #isTouched;
     constructor(name, url) {
@@ -14,8 +27,10 @@ export function Level(props) {
     touch() {
       if (this.#isTouched) {
         alert("error , ya esta tocada");
+        return false;
       } else {
         this.#isTouched = true;
+        return true;
       }
     }
 
@@ -36,13 +51,6 @@ export function Level(props) {
     new Waifu("Robert", "/img/waifus/robert.jpg"),
   ];
 
-  const [currentLevel, setCurrentLevel] = useState(1);
-
-  const [levelContent, setLevelContent] = useState({
-    arr: [],
-    backgroundImage: "",
-  });
-
   function pickRandomElements(arr, quantity) {
     let pickedElements = [];
     let remainingElements = [...arr];
@@ -57,6 +65,13 @@ export function Level(props) {
   }
 
   useEffect(() => {
+    if (score > bestScore) {
+      setBestScore(score);
+    }
+  }, [score]);
+
+  //switch
+  useEffect(() => {
     console.log("render");
     switch (currentLevel) {
       case 1:
@@ -68,7 +83,14 @@ export function Level(props) {
         break;
       case 2:
         setLevelContent({
-          arr: [pickRandomElements(waifusArr, 6)],
+          arr: [...pickRandomElements(waifusArr, 6)],
+          backgroundImage: "to be set",
+        });
+
+        break;
+      case 3:
+        setLevelContent({
+          arr: [...pickRandomElements(waifusArr, 8)],
           backgroundImage: "to be set",
         });
 
@@ -76,7 +98,25 @@ export function Level(props) {
       default: {
       }
     }
-  }, []);
+  }, [currentLevel]);
+
+  useEffect(() => {
+    if (currentLevel === 1) {
+      if (score === 4) {
+        alert("you win");
+        setCurrentLevel(2);
+      }
+    } else if (currentLevel === 2) {
+      if (score === 10) {
+        alert("you win");
+        setCurrentLevel(3);
+      }
+    } else if (currentLevel === 3) {
+      if (score === 18) {
+        alert("no more levels you won the game");
+      }
+    }
+  }, [score]);
 
   function shuffleArray(array) {
     let shuffledArray = [...array];
@@ -90,38 +130,64 @@ export function Level(props) {
     return shuffledArray;
   }
 
-  function x() {
-    setLevelContent({ arr: shuffleArray(levelContent.arr) });
-  }
-
-  return (
-    <div className="App">
-      <div className="header"></div>
-      <div className="body">
-        <div className="cards-container">
-          {levelContent.arr.map((waifu) => {
-            return (
-              <Card
-                waifu={waifu}
-                shuffle={() => {
-                  console.log(levelContent.arr.indexOf(waifu));
-                  console.log(waifu.name);
-                  waifu.touch();
-                  console.log(levelContent.arr);
-                  setLevelContent({ arr: shuffleArray(levelContent.arr) });
-                }}
-              />
-            );
-          })}
-        </div>
-        <button
-          onClick={() => {
-            console.log(levelContent.arr);
-          }}
-        >
-          Click
-        </button>
+  return isGameOver ? (
+    <div>
+      <p>is game over</p>
+      <button
+        onClick={() => {
+          setIsGameOver(false);
+          setCurrentLevel(1);
+          setScore(0);
+          ////
+          setLevelContent({
+            arr: [...pickRandomElements(waifusArr, 4)],
+            backgroundImage: "to be set",
+          });
+        }}
+      >
+        Reiniciar
+      </button>
+    </div>
+  ) : (
+    <div className="body">
+      <div className="header">
+        <p>Memoria waifu</p>
+        <p>Nivel : {currentLevel}</p>
+        <p>
+          Puntuacion: {score} | Mejor:{bestScore}
+        </p>
       </div>
+      <div className="cards-container">
+        {levelContent.arr.map((waifu) => {
+          return (
+            <Card
+              waifu={waifu}
+              shuffle={() => {
+                /* console.log(levelContent.arr.indexOf(waifu));
+                console.log(waifu.name); */
+                if (waifu.touch()) {
+                  setLevelContent({ arr: shuffleArray(levelContent.arr) });
+                  increaseScore();
+                } else {
+                  alert("game over");
+                  setIsGameOver(true);
+                }
+              }}
+              setLevelContent={setLevelContent}
+
+              /* increaseScore= {increaseScore} */
+            />
+          );
+        })}
+      </div>
+      <button
+        onClick={() => {
+          console.log(levelContent.arr);
+        }}
+      >
+        Click
+      </button>
+      <button>Increase score</button>
     </div>
   );
 }
