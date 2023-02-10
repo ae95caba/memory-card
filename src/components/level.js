@@ -26,7 +26,7 @@ export function Level(props) {
 
     touch() {
       if (this.#isTouched) {
-        alert("error , ya esta tocada");
+        //alert("error , ya esta tocada");
         return false;
       } else {
         this.#isTouched = true;
@@ -77,21 +77,21 @@ export function Level(props) {
       case 1:
         setLevelContent({
           arr: [...pickRandomElements(waifusArr, 4)],
-          backgroundImage: "to be set",
+          backgroundImage: "url(/img/lvl1-background.jpg)",
         });
 
         break;
       case 2:
         setLevelContent({
           arr: [...pickRandomElements(waifusArr, 6)],
-          backgroundImage: "to be set",
+          backgroundImage: "url(/img/lvl2-background.jpg)",
         });
 
         break;
       case 3:
         setLevelContent({
           arr: [...pickRandomElements(waifusArr, 8)],
-          backgroundImage: "to be set",
+          backgroundImage: "url(/img/lvl3-background.jpg)",
         });
 
         break;
@@ -109,14 +109,19 @@ export function Level(props) {
   }
 
   useEffect(() => {
+    const cardsContainer = document.getElementById("cards-container");
+    cardsContainer.style.backgroundImage = levelContent.backgroundImage;
+  }, [currentLevel]);
+
+  useEffect(() => {
     if (currentLevel === 1) {
       if (score === 4) {
-        alert("you win");
+        //alert("you win");
         setCurrentLevel(2);
       }
     } else if (currentLevel === 2) {
       if (score === 10) {
-        alert("you win");
+        //alert("you win");
         setCurrentLevel(3);
       }
     } else if (currentLevel === 3) {
@@ -143,8 +148,9 @@ export function Level(props) {
   }
 
   return isGameOver ? (
-    <div>
-      <p>is game over</p>
+    <div id="game-over">
+      <img src="/img/death.png" alt="death" />
+      <p>Fin del juego</p>
       <button
         onClick={() => {
           setIsGameOver(false);
@@ -153,7 +159,7 @@ export function Level(props) {
           ////
           setLevelContent({
             arr: [...pickRandomElements(waifusArr, 4)],
-            backgroundImage: "to be set",
+            backgroundImage: levelContent.backgroundImage,
           });
         }}
       >
@@ -162,24 +168,33 @@ export function Level(props) {
     </div>
   ) : (
     <div className="body">
-      <div className="header">
-        <p>Memoria waifu</p>
-        <p>Nivel : {currentLevel}</p>
+      <div id="header">
+        <p className="font-effect-neon">Memoria waifu</p>
         <p>
-          Puntuacion: {score} | Mejor:{bestScore}
+          Nivel : <span id="level">{currentLevel}</span>
+        </p>
+        <p>
+          <span id="score">Puntuacion: {score}</span> |
+          <span id="best-score"> Mejor Puntuacion: {bestScore}</span>
         </p>
       </div>
-      <div className="cards-container">
+      <div
+        id="cards-container"
+        style={{ backgroundImage: levelContent.backgroundImage }}
+      >
         {levelContent.arr.map((waifu) => {
           return (
             <Card
               waifu={waifu}
               onClick={() => {
                 if (waifu.touch()) {
-                  setLevelContent({ arr: shuffleArray(levelContent.arr) });
+                  setLevelContent({
+                    arr: shuffleArray(levelContent.arr),
+                    backgroundImage: levelContent.backgroundImage,
+                  });
                   increaseScore();
                 } else {
-                  alert("game over");
+                  //alert("game over");
                   setIsGameOver(true);
                 }
               }}
