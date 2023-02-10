@@ -100,6 +100,14 @@ export function Level(props) {
     }
   }, [currentLevel]);
 
+  function coso() {
+    const loadingScreen = document.getElementById("loading");
+    loadingScreen.style.display = "flex";
+    setTimeout(() => {
+      loadingScreen.style.display = "none";
+    }, 1000);
+  }
+
   useEffect(() => {
     if (currentLevel === 1) {
       if (score === 4) {
@@ -117,6 +125,10 @@ export function Level(props) {
       }
     }
   }, [score]);
+
+  useEffect(() => {
+    coso();
+  }, [currentLevel]);
 
   function shuffleArray(array) {
     let shuffledArray = [...array];
@@ -162,9 +174,7 @@ export function Level(props) {
           return (
             <Card
               waifu={waifu}
-              shuffle={() => {
-                /* console.log(levelContent.arr.indexOf(waifu));
-                console.log(waifu.name); */
+              onClick={() => {
                 if (waifu.touch()) {
                   setLevelContent({ arr: shuffleArray(levelContent.arr) });
                   increaseScore();
@@ -174,20 +184,14 @@ export function Level(props) {
                 }
               }}
               setLevelContent={setLevelContent}
-
-              /* increaseScore= {increaseScore} */
             />
           );
         })}
       </div>
-      <button
-        onClick={() => {
-          console.log(levelContent.arr);
-        }}
-      >
-        Click
-      </button>
-      <button>Increase score</button>
+      <div id="loading" style={{ display: "none" }}>
+        <img src="/img/loading.png" alt="cute anime girl" />
+        <p>Cargando nivel {currentLevel}</p>
+      </div>
     </div>
   );
 }
