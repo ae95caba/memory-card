@@ -28,6 +28,7 @@
     width: 6rem;
     animation-name: spin;
     animation-duration: 500ms;
+    animation-delay: 1000ms;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
   }
@@ -42,7 +43,6 @@
 }
 
 #game-over {
-  border: 1px solid red;
   height: 100vh;
   width: 100vw;
   display: flex;
@@ -115,5 +115,42 @@
   }
   #best-score {
     color: gold;
+  }
+}
+
+#start,
+#end {
+  position: relative;
+
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  background-color: black;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  p {
+    font-size: 3.5rem;
+    color: white;
+  }
+  button {
+    font-size: 2.5rem;
+    color: black;
+    background-color: white;
+    text-shadow: 1px 1px 1px black;
+    width: 100%;
+  }
+  img {
+    width: 15rem;
+    position: absolute;
+    top: 5%;
+  }
+}
+
+#end {
+  img {
+    width: 8rem !important;
   }
 }

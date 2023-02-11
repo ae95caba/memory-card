@@ -2,6 +2,13 @@ import { useState, useEffect } from "react";
 import { Card } from "./card";
 
 export function Level(props) {
+  const siii = new Audio("/sounds/siii.mp3");
+  const victory = new Audio("/sounds/victory.mp3");
+  const nya = new Audio("/sounds/nya.mp3");
+  const tutorial = new Audio("sounds/tutorial.mp3");
+  const [hasEnded, setHasEnded] = useState(false);
+  const [isStarted, setIsStarted] = useState(false);
+
   const [score, setScore] = useState(0);
   const [bestScore, setBestScore] = useState(score);
   const [currentLevel, setCurrentLevel] = useState(1);
@@ -64,13 +71,14 @@ export function Level(props) {
     return pickedElements;
   }
 
+  //set best score
   useEffect(() => {
     if (score > bestScore) {
       setBestScore(score);
     }
   }, [score]);
 
-  //switch
+  //switch level content
   useEffect(() => {
     console.log("render");
     switch (currentLevel) {
@@ -100,40 +108,49 @@ export function Level(props) {
     }
   }, [currentLevel]);
 
-  function coso() {
+  function loadingScreen() {
     const loadingScreen = document.getElementById("loading");
     loadingScreen.style.display = "flex";
     setTimeout(() => {
       loadingScreen.style.display = "none";
-    }, 1000);
+    }, 2500);
   }
 
-  useEffect(() => {
-    const cardsContainer = document.getElementById("cards-container");
-    cardsContainer.style.backgroundImage = levelContent.backgroundImage;
-  }, [currentLevel]);
-
+  //go to next level or end game(by wining every level)
   useEffect(() => {
     if (currentLevel === 1) {
       if (score === 4) {
-        //alert("you win");
         setCurrentLevel(2);
+        setTimeout(() => {
+          siii.play();
+        }, 1000);
       }
     } else if (currentLevel === 2) {
       if (score === 10) {
-        //alert("you win");
         setCurrentLevel(3);
+        setTimeout(() => {
+          siii.play();
+        }, 1000);
       }
     } else if (currentLevel === 3) {
       if (score === 18) {
-        alert("no more levels you won the game");
+        console.log("no more levels you won the game");
+        setHasEnded(true);
+        setTimeout(() => {
+          victory.play();
+        }, 1000);
       }
     }
   }, [score]);
 
   useEffect(() => {
-    coso();
+    loadingScreen();
   }, [currentLevel]);
+
+  useEffect(() => {
+    if (isGameOver) {
+    }
+  }, [isGameOver]);
 
   function shuffleArray(array) {
     let shuffledArray = [...array];
@@ -145,6 +162,11 @@ export function Level(props) {
       ];
     }
     return shuffledArray;
+  }
+
+  function start() {
+    document.getElementById("start").style.display = "none";
+    tutorial.play();
   }
 
   return isGameOver ? (
@@ -165,6 +187,10 @@ export function Level(props) {
       >
         Reiniciar
       </button>
+
+      <audio autoPlay="autoplay" hidden="hidden">
+        <source src="/sounds/violin.mp3" type="audio/mp3" />
+      </audio>
     </div>
   ) : (
     <div className="body">
@@ -188,6 +214,7 @@ export function Level(props) {
               waifu={waifu}
               onClick={() => {
                 if (waifu.touch()) {
+                  nya.play();
                   setLevelContent({
                     arr: shuffleArray(levelContent.arr),
                     backgroundImage: levelContent.backgroundImage,
@@ -206,6 +233,39 @@ export function Level(props) {
       <div id="loading" style={{ display: "none" }}>
         <img src="/img/loading.png" alt="cute anime girl" />
         <p>Cargando nivel {currentLevel}</p>
+      </div>
+      <div id="start" style={{ display: `${isStarted ? "none" : "flex"}` }}>
+        <img src="img/welcome.gif" alt="welcome" />
+        <p>Bienvenido !</p>
+        <button
+          onClick={() => {
+            if (!isStarted) {
+              document.getElementById("start").style.display = "none";
+              tutorial.play();
+              setIsStarted(true);
+            }
+          }}
+        >
+          Iniciar
+        </button>
+      </div>
+      <div id="end" style={{ display: `${hasEnded ? "flex" : "none"}` }}>
+        <img src="img/win.gif" alt="win" />
+        <p>Ganaste !</p>
+        <button
+          onClick={() => {
+            setHasEnded(false);
+            setCurrentLevel(1);
+            setScore(0);
+            ////
+            setLevelContent({
+              arr: [...pickRandomElements(waifusArr, 4)],
+              backgroundImage: levelContent.backgroundImage,
+            });
+          }}
+        >
+          Reiniciar
+        </button>
       </div>
     </div>
   );
